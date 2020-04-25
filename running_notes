@@ -1,0 +1,137 @@
+######### LIQUIBASE NOTES ############ https://www.liquibase.org/documentation/
+==========================================================================================
+SETTING UP LIQUIBASE IN STANDALONE WITH A DATABASE
+==========================================================================================
+Installation
+=============
+
+Download .exe file
+------------------
+- run the exe file it set the path automatically and creates the root folder
+
+(or)  
+
+the .zip folder
+---------------
+Make sure 
+- 	Java 8 or above is installed. 
+- 	JAVA_HOME is set properly 
+-	Extract the contents into some location (this is your liquibase roor folder)
+-  	Set path if you are in a windows machine (to the extracted location )
+	For ex. C:\liquibase-3.8.9
+	
+Testing the installation
+------------------------
+from cmd or powershell , do a 'liquibase' command from any directory and it should work.
+
+Settings and directory stucture
+===============================
+
+liquibase root dir -|
+					|-- h2.jar file
+					|-- liquibase.properties
+					|--changeLog.xml
+					|-- *.mv.db file ( gets created automatically)
+
+
+liquibase.properties
+---------------------
+changeLogFile: myChangeLog.xml --- master Change log file 
+url: jdbc:h2:file:./h2tutorial --- or any other DB's jdbc property 
+username: admin
+password: password
+classpath: h2-1.4.200.jar
+
+myChangeLog<or any file name>.xml 
+----------------------------------
+Check liquibase docs for change log syntax
+
+sample:
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+	http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+	<changeSet id="1" author="bob">
+		<createTable tableName="department">
+			<column name="id" type="int">
+				<constraints primaryKey="true" nullable="false"/>
+			</column>
+			<column name="name" type="varchar(50)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="active" type="boolean"
+			  defaultValueBoolean="true"/>
+		</createTable>
+	</changeSet>
+</databaseChangeLog>
+
+
+
+To run the changeLog file standalone:
+==========================================
+liquibase update 
+liquibase --changeLogFile=<filename.ext> update
+======================================================================ROLLBACK NOTES STARTS===========================================================
+Rollback:
+========================================== 
+Refer to Liquibase documentation to learn the concepts.
+
+rollbackOneChangeSet: <<PRO VERSION>>
+---------------------
+liquibase --changesetPath=changelog.xml rollbackOneChangeSet --changeSetAuthor="Hari" --changeSetId="3" --changeSetPath=changelog.xml  --force
+
+rollbackCount:
+---------------------
+liquibase rollbackCount 1
+
+rollbackToDate
+---------------------
+liquibase rollbackToDate 2019-04-23T21:10:16.000
+
+
+
+======================================================================ROLLBACK NOTES ENDS===========================================================
+
+
+
+DB Snapshot:
+========================================== 
+liquibase --outputFile=myschemaSnapshot.json snapshot --snapshotFormat=json
+
+diffChangeLog:
+========================================== 
+liquibase --outputFile=before1.json snapshot --snapshotFormat=json
+<make some manual changes in DB>
+liquibase --referenceUrl=offline:h2?snapshot=before.json diffChangeLog
+<your manual changes gets synced up as a changeLog>
+
+==========================================================================================
+SETTING UP LIQUIBASE IN SPRINGBOOT PROJECT
+==========================================================================================
+
+1. Add below in the application.properties
+-------------------------------------------
+spring.liquibase.change-log=classpath:db/changelog/changelog-master.xml
+note: create the above path inside the resources folder of the project.
+
+2. Maven dependencies to be added in POM.XML
+---------------------------------------------
+
+<dependency>
+	<groupId>org.liquibase</groupId>
+	<artifactId>liquibase-core</artifactId>
+	<version>3.8.9</version>
+</dependency>
+
+and in plugins, add the below:
+<plugin>
+	<groupId>org.liquibase</groupId>
+	<artifactId>liquibase-maven-plugin</artifactId>
+	<version>3.4.1</version>
+	<configuration>                  
+		<propertyFile>src/main/resources/application-local.properties</propertyFile>
+	</configuration>                
+</plugin>
+            
