@@ -21,9 +21,7 @@ Make sure
 -  	Set path if you are in a windows machine (to the extracted location )
 	For ex. C:\liquibase-3.8.9
 	
-## Verifying the installation
-
-From cmd or powershell , do a'liquibase' command from any directory and it should work.
+From cmd or powershell , do a'liquibase' command from any directory to check if installtion is successful.
 
 # Info about the repo
 
